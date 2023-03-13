@@ -1,0 +1,125 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Tag Details</title>
+  </head>
+  <body>
+    <form id="myForm">
+       <label for="reader-id">Reader ID:</label>
+      <input type="text" id="ReaderID" name="readerid"><br>
+      <label for="version">Version:</label>
+      <input type="text" id="Version" name="version"><br>
+      <label for="date">Date:</label>
+      <input type="date" id="Date" name="date"><br>
+      <label for="time">Time:</label>
+      <input type="time" id="Time" name="time"><br>
+      <label for="signal-strength">Signal Strength:</label>
+      <input type="text" id="Signalstrength" name="signal_strength"><br>
+      <label for="imei">IMEI:</label>
+      <input type="text" id="IMEI" name="imei"><br>
+     <label for="tag-id">Tag ID:</label>
+      <input type="text" id="TagID" name="tag_id"><br>
+      <label for="amount">Amount:</label>
+      <input type="text" id="Amount" name="amount"><br>
+      <input type="submit" value="Submit">
+     
+      <label for="tag-id">Tag ID:</label>
+      <input type="text" id="TagID" name="tag_id"><br>
+      
+    
+    </form>
+
+    <script>
+      const form = document.querySelector('#myForm');
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault(); // prevent the default form submission behavior
+
+  const tagId = document.querySelector('#TagID').value;
+  const url = `http://localhost:3000/api/data/:tagID`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log(data);
+      localStorage.setItem('tagData', JSON.stringify(data));
+      window.location.href = 'target-page.html';
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
+});
+
+    </script>
+  </body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>REST API Authentication Example</title>
+</head>
+<body>
+  <h1>REST API Authentication Example</h1>
+  <div id="login-form">
+    <h2>Login</h2>
+    <form>
+      <label>Username: <input type="text" id="username"></label><br>
+      <label>Password: <input type="password" id="password"></label><br>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+  <div id="protected-content" style="display: none;">
+    <h2>Protected Content</h2>
+    <p id="content"></p>
+  </div>
+
+  <script>
+    const apiUrl = 'http://localhost:3000'; // replace with your API URL
+    let authToken = null;
+
+    // handle login form submission
+    document.querySelector('#login-form form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.querySelector('#username').value;
+      const password = document.querySelector('#password').value;
+      const response = await fetch(`${apiUrl}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        authToken = data.token;
+        document.querySelector('#login-form').style.display = 'none';
+        document.querySelector('#protected-content').style.display = 'block';
+        loadProtectedContent();
+      } else {
+        alert('Invalid username or password');
+      }
+    });
+
+    // handle loading protected content
+    async function loadProtectedContent() {
+      const response = await fetch(`${apiUrl}/protected`, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        document.querySelector('#content').textContent = data.message;
+      } else {
+        alert('Authentication error');
+      }
+    }
+  </script>
+</body>
+</html>
